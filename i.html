@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>موقعي المتكامل</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root{
+    --primary:#c8102e; 
+    --bg:#f4f7f6;
+    --muted:#6b6b6b;
+    --card:#fff;
+    --shadow: rgba(0,0,0,0.08);
+    --radius:12px;
+    --font: "Tahoma", Arial, sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--font);background:var(--bg);color:#111;direction:rtl;line-height: 1.6;}
+  
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 25px;background:linear-gradient(90deg,var(--primary),#a20a16);color:#fff;box-shadow: 0 2px 10px rgba(0,0,0,0.1);position: sticky;top: 0;z-index: 1000;}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo-txt{font-weight:800;font-size:20px;letter-spacing: 1px;}
+  .nav{display:flex;gap:10px;align-items:center}
+  .nav a, .nav button{color:#fff;background:transparent;border:none;cursor:pointer;padding:8px 12px;border-radius:8px;text-decoration:none;transition: 0.3s;}
+  .nav a:hover, .nav button:hover{background:rgba(255,255,255,0.15)}
+  .nav a.active{background:rgba(255,255,255,0.2)}
+  
+  .app{display:flex;min-height:calc(100vh - 60px)}
+  .sidebar{width:180px;background:#fff;padding:20px 10px;display:flex;flex-direction:column;gap:10px;border-left: 1px solid #eee;}
+  .side-link{font-size:15px;color:var(--muted);cursor:pointer;padding:12px;border-radius:8px;transition: 0.2s;display: flex;align-items: center;gap:8px}
+  .side-link:hover{background:var(--bg);color:var(--primary)}
+  .main{flex:1;padding:25px}
+  .container{max-width:1100px;margin:0 auto}
+  .hero{background:linear-gradient(135deg,var(--primary),#b80f1a);color:#fff;padding:40px;border-radius:var(--radius);text-align: center;margin-bottom: 30px;}
+  .social-container { display: flex; gap: 15px; justify-content: center; margin-top: 15px; }
+  .social-icon { color: white; font-size: 22px; transition: 0.3s; }
+  .social-icon:hover { transform: scale(1.2); opacity: 0.8; }
+  .articles, .products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+  .card, .product-card{background:var(--card);padding:15px;border-radius:var(--radius);box-shadow:0 6px 18px var(--shadow);transition: 0.3s;}
+  .card:hover, .product-card:hover{transform: translateY(-5px);}
+  .card img, .product-card img{width:100%;height:180px;object-fit:cover;border-radius:8px;margin-bottom: 10px;}
+  .admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+  input,textarea,select{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-top:8px;font-family: inherit;}
+  label{font-weight:600;margin-top:12px;display:block;font-size: 14px;}
+  .btn{padding:10px 16px;border-radius:8px;border:none;cursor:pointer;font-weight: 600;transition: 0.2s;}
+  .btn-primary{background:var(--primary);color:#fff}
+  .btn-primary:hover{background: #a20a16;}
+  .btn-outline{background:transparent;border:1px solid var(--primary);color:var(--primary)}
+  .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:2000;padding:16px;backdrop-filter: blur(4px);}
+  .modal .panel{background:#fff;padding:25px;border-radius:var(--radius);max-width:600px;width:100%;max-height:90vh;overflow:auto;position: relative;}
+  .close{position: absolute; top: 15px; left: 15px; cursor:pointer; background:#f0f0f0; border-radius:50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;}
+  @media(max-width:900px){
+    .sidebar{display:none}
+    .app{flex-direction: column;}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div id="logoLeft" class="logo-txt">تحميل...</div>
+  </div>
+  <nav class="nav">
+    <a id="navHome" href="#" onclick="navigate('home');return false" class="active"><i class="fas fa-home"></i> الرئيسية</a>
+    <a id="navShop" href="#" onclick="navigate('shop');return false"><i class="fas fa-store"></i> المتجر</a>
+    <button onclick="openCodePrompt()"><i class="fas fa-lock"></i> الإدارة</button>
+  </nav>
+</header>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="side-link" onclick="navigate('home')"><i class="fas fa-home"></i> الرئيسية</div>
+    <div class="side-link" onclick="navigate('shop')"><i class="fas fa-shopping-bag"></i> المتجر</div>
+    <div class="side-link" onclick="openCodePrompt()"><i class="fas fa-cog"></i> الإعدادات</div>
+    <hr style="width: 100%; border: 0; border-top: 1px solid #eee;">
+    <div id="sidebarSocial" class="social-container" style="justify-content: flex-start; padding: 10px; color: #111;">
+      </div>
+  </aside>
+
+  <main class="main">
+    <div class="container">
+
+      <section id="page-home" class="page">
+        <div class="hero">
+          <h1 id="siteTitle">مرحباً بك</h1>
+          <p id="siteTag">تحميل الوصف...</p>
+          <div id="heroSocial" class="social-container"></div>
+        </div>
+        <h3 style="margin-bottom:20px"><i class="fas fa-bullhorn"></i> آخر الأخبار والإعلانات</h3>
+        <div id="articlesList" class="articles"></div>
+      </section>
+
+      <section id="page-shop" class="page" style="display:none">
+        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h2><i class="fas fa-shopping-cart"></i> متجرنا</h2>
+            <div>
+              <select id="shopSectionFilter" onchange="renderShop()" style="margin-right:10px; padding:5px; border-radius:6px; border:1px solid #ccc"></select>
+              <button class="btn btn-outline" onclick="toggleCartDropdown()">
+                🛒 السلة (<span id="cartCount">0</span>)
+              </button>
+            </div>
+        </div>
+        <div style="margin-bottom:20px">
+          <input id="shopSearch" placeholder="🔍 ابحث عن منتج..." oninput="renderShop()">
+        </div>
+        <div id="productsGrid" class="products-grid"></div>
+      </section>
+
+      <section id="page-admin" class="page" style="display:none">
+        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>لوحة الإدارة</h2>
+            <button class="btn btn-outline" onclick="navigate('home')">خروج</button>
+        </div>
+        
+        <div class="admin-grid">
+          <div class="card">
+            <h3><i class="fas fa-tools"></i> الإعدادات العامة والروابط</h3>
+            <label>عنوان الموقع</label>
+            <input id="inputTitle">
+            <label>وصف الموقع</label>
+            <input id="inputTag">
+            <label>اسم الشعار (Logo)</label>
+            <input id="inputLogo">
+            <hr>
+            <h4 style="margin: 15px 0 5px 0;"><i class="fas fa-share-alt"></i> روابط التواصل</h4>
+            <label><i class="fab fa-facebook"></i> رابط الفيسبوك</label>
+            <input id="inputFB" placeholder="https://facebook.com/yourpage">
+            <label><i class="fab fa-whatsapp"></i> رقم الواتساب (بدون +)</label>
+            <input id="inputWA" placeholder="9665xxxxxxxx">
+            <label><i class="fab fa-instagram"></i> رابط الإنستغرام</label>
+            <input id="inputInsta" placeholder="https://instagram.com/user">
+            <label>كود الدخول للوحة</label>
+            <input id="inputCode" type="password">
+            <label>اللون الأساسي</label>
+            <input id="inputColor" type="color">
+            <div style="margin-top:20px; display:flex; gap:10px">
+              <button class="btn btn-primary" onclick="saveSettings()">حفظ الكل</button>
+              <button class="btn btn-outline" onclick="resetData()">مسح شامل</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3><i class="fas fa-images"></i> معرض الوسائط</h3>
+            <input id="mediaFile" type="file" accept="image/*,video/*">
+            <button class="btn btn-primary" style="width:100%; margin-top:10px" onclick="addMediaFromInput()">رفع للمكتبة</button>
+            <div id="mediaList" style="margin-top:15px; max-height: 200px; overflow-y: auto;"></div>
+          </div>
+
+          <div class="card">
+            <h3><i class="fas fa-edit"></i> إضافة مقال/إعلان</h3>
+            <input id="articleTitle" placeholder="العنوان">
+            <textarea id="articleBody" rows="3" placeholder="التفاصيل..."></textarea>
+            <label>اختر صورة من المعرض</label>
+            <select id="articleMediaSelect"></select>
+            <label><input id="articleFeatured" type="checkbox"> مقال مميز (يظهر أولاً)</label>
+            <button class="btn btn-primary" style="width:100%; margin-top:10px" onclick="addArticle()">نشر المقال</button>
+            <div id="adminArticlesList" style="margin-top:15px"></div>
+          </div>
+
+          <div class="card">
+            <h3><i class="fas fa-th-large"></i> إدارة الأقسام</h3>
+            <input id="sectionName" placeholder="اسم القسم">
+            <textarea id="sectionDesc" rows="2" placeholder="وصف القسم..."></textarea>
+            <button class="btn btn-primary" style="width:100%; margin-top:10px" onclick="addSection()">إضافة القسم</button>
+            <div id="adminSectionsList" style="margin-top:15px"></div>
+          </div>
+
+          <div class="card">
+            <h3><i class="fas fa-plus-circle"></i> إضافة منتج</h3>
+            <input id="prodName" placeholder="اسم المنتج">
+            <input id="prodPrice" placeholder="السعر">
+            <textarea id="prodDesc" rows="2" placeholder="وصف المنتج..."></textarea>
+            <label>صورة المنتج</label>
+            <select id="prodMediaSelect"></select>
+            <label>اختر القسم</label>
+            <select id="prodSectionSelect"></select>
+            <button class="btn btn-primary" style="width:100%; margin-top:10px" onclick="addProduct()">إضافة للمتجر</button>
+            <div id="adminProductsList" style="margin-top:15px"></div>
+          </div>
+
+          <div class="card">
+            <h3><i class="fas fa-clipboard-list"></i> الطلبات المستلمة</h3>
+            <div id="ordersList"></div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<div id="viewModal" class="modal"><div class="panel">
+  <span class="close" onclick="closeModal('viewModal')">&times;</span>
+  <div id="viewModalContent"></div>
+</div></div>
+
+<div id="cartModal" class="modal"><div class="panel">
+  <span class="close" onclick="closeModal('cartModal')">&times;</span>
+  <h3>اتمام الطلب</h3>
+  <div id="cartModalProductName" style="font-weight:bold; color:var(--primary)"></div>
+  <label>رقم هاتفك</label><input id="orderPhone">
+  <label>عنوان التوصيل</label><input id="orderAddress">
+  <button class="btn btn-primary" style="width:100%; margin-top:15px" onclick="confirmCartOrder()">إرسال الطلب</button>
+</div></div>
+
+<div id="codePrompt" class="modal"><div class="panel">
+  <span class="close" onclick="closeModal('codePrompt')">&times;</span>
+  <h3>دخول الإدارة</h3>
+  <input id="codeInput" type="password" placeholder="أدخل الكود السري">
+  <button class="btn btn-primary" style="width:100%; margin-top:10px" onclick="checkAdminCode()">دخول</button>
+</div></div>
+
+<div id="cartDropdown" style="position:fixed; left:20px; top:70px; display:none; z-index:1500;"></div>
+
+<script>
+const KEYS = {
+  settings:'v2_set', media:'v2_med', articles:'v2_art', products:'v2_prd',
+  orders:'v2_ord', cart:'v2_crt', sections:'v2_sec'
+};
+
+const DEFAULTS = {
+  settings: { 
+    title:'متجري المطور', tag:'أهلاً بك في منصتنا الإلكترونية', logoText:'LOGO', color:'#c8102e', code:'201099',
+    facebook: '', whatsapp: '', instagram: ''
+  },
+  media: [], articles: [], products: [], orders: [], cart: [], sections: []
+};
+
+function load(k,d){ return JSON.parse(localStorage.getItem(k)) || d; }
+function save(k,v){ localStorage.setItem(k,JSON.stringify(v)); }
+
+let settings = load(KEYS.settings, DEFAULTS.settings);
+let media = load(KEYS.media, DEFAULTS.media);
+let articles = load(KEYS.articles, DEFAULTS.articles);
+let products = load(KEYS.products, DEFAULTS.products);
+let orders = load(KEYS.orders, DEFAULTS.orders);
+let cart = load(KEYS.cart, DEFAULTS.cart);
+let sections = load(KEYS.sections, DEFAULTS.sections);
+
+function navigate(p){
+  document.querySelectorAll('.page').forEach(s=>s.style.display='none');
+  document.getElementById('page-'+p).style.display='block';
+  document.querySelectorAll('.nav a').forEach(a=>a.classList.remove('active'));
+  if(p==='home') document.getElementById('navHome').classList.add('active');
+  if(p==='shop') document.getElementById('navShop').classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function applySettingsToDOM(){
+  document.getElementById('siteTitle').innerText = settings.title;
+  document.getElementById('siteTag').innerText = settings.tag;
+  document.getElementById('logoLeft').innerText = settings.logoText;
+  document.documentElement.style.setProperty('--primary', settings.color);
+  renderSocialLinks();
+}
+
+function renderSocialLinks(){
+  const containers = [document.getElementById('heroSocial'), document.getElementById('sidebarSocial')];
+  const links = [
+    { id: 'facebook', icon: 'fab fa-facebook', url: settings.facebook },
+    { id: 'whatsapp', icon: 'fab fa-whatsapp', url: settings.whatsapp ? `https://wa.me/${settings.whatsapp}` : '' },
+    { id: 'instagram', icon: 'fab fa-instagram', url: settings.instagram }
+  ];
+  containers.forEach(container=>{
+    if(!container) return;
+    container.innerHTML='';
+    links.forEach(l=>{
+      if(l.url){
+        container.innerHTML += `<a href="${l.url}" target="_blank" class="social-icon" style="${container.id==='sidebarSocial'?'color:#444':''}"><i class="${l.icon}"></i></a>`;
+      }
+    });
+  });
+}
+
+function renderArticles(){
+  const root = document.getElementById('articlesList');
+  root.innerHTML = articles.length ? '' : '<p>لا توجد مقالات حالياً.</p>';
+  articles.forEach(a=>{
+    const d=document.createElement('div'); d.className='card';
+    d.innerHTML=`<h3>${a.title} ${a.featured?'⭐':''}</h3>${a.media?(a.media.includes('video')?`<video src="${a.media}" controls style="width:100%; border-radius:8px"></video>`:`<img src="${a.media}">`):''}<p>${a.body}</p>`;
+    root.appendChild(d);
+  });
+}
+
+function renderSectionsAdmin(){
+  const list = document.getElementById('adminSectionsList');
+  list.innerHTML = sections.length ? '' : 'لا توجد أقسام';
+  sections.forEach((s,i)=>{
+    list.innerHTML += `<div class="small">📂 ${s.name} 
+      <button onclick="sections.splice(${i},1); save(KEYS.sections,sections); renderSectionsAdmin(); updateSectionSelectors(); renderShop()">حذف</button></div>`;
+  });
+}
+
+function addSection(){
+  const name = document.getElementById('sectionName').value.trim();
+  const desc = document.getElementById('sectionDesc').value.trim();
+  if(!name) return alert('أدخل اسم القسم');
+  const id = 'sec_'+Date.now();
+  sections.unshift({name, description: desc, id});
+  save(KEYS.sections, sections);
+  document.getElementById('sectionName').value='';
+  document.getElementById('sectionDesc').value='';
+  renderSectionsAdmin();
+  updateSectionSelectors();
+  renderShop();
+}
+
+function updateSectionSelectors(){
+  const prodSelect = document.getElementById('prodSectionSelect');
+  const shopFilter = document.getElementById('shopSectionFilter');
+  [prodSelect, shopFilter].forEach(sel=>{
+    if(!sel) return;
+    sel.innerHTML = '<option value="">بدون قسم</option>';
+    sections.forEach(s=> sel.innerHTML += `<option value="${s.id}">${s.name}</option>`);
+  });
+}
+
+function addProduct(){
+  const name = document.getElementById('prodName').value.trim();
+  const price = document.getElementById('prodPrice').value.trim();
+  const desc = document.getElementById('prodDesc').value.trim();
+  const mediaIdx = document.getElementById('prodMediaSelect').value;
+  const section = document.getElementById('prodSectionSelect').value;
+  if(!name||!price) return alert('أدخل اسم وسعر المنتج');
+  products.unshift({name, price, desc, image: media[mediaIdx]?media[mediaIdx].data:'', section});
+  save(KEYS.products,products);
+  document.getElementById('prodName').value='';
+  document.getElementById('prodPrice').value='';
+  document.getElementById('prodDesc').value='';
+  renderShop();
+  renderProductsAdmin();
+}
+
+function renderShop(){
+  const root = document.getElementById('productsGrid');
+  const q = document.getElementById('shopSearch').value.toLowerCase();
+  const selectedSec = document.getElementById('shopSectionFilter')?.value || '';
+  root.innerHTML = '';
+  const filtered = products.filter(p => 
+    p.name.toLowerCase().includes(q) &&
+    (selectedSec==='' || p.section===selectedSec)
+  );
+  filtered.forEach((p, i)=>{
+    const d = document.createElement('div'); d.className='product-card';
+    d.innerHTML = `<img src="${p.image||''}"><h4>${p.name}</h4><p>${p.price} ج.م</p>
+      <div style="display:flex; gap:5px">
+        <button class="btn btn-outline" style="flex:1" onclick="viewProduct(${i})">عرض</button>
+        <button class="btn btn-primary" style="flex:1" onclick="openCartModal(${i})">اطلب</button>
+      </div>`;
+    root.appendChild(d);
+  });
+  document.getElementById('cartCount').innerText = cart.length;
+}
+
+function renderProductsAdmin(){
+  const list = document.getElementById('adminProductsList');
+  list.innerHTML = products.length ? '' : 'لا توجد منتجات';
+  products.forEach((p,i)=>{
+    list.innerHTML += `<div class="small">🛍️ ${p.name} (${p.price}ج) 
+      <button onclick="products.splice(${i},1); save(KEYS.products,products); renderProductsAdmin(); renderShop()">حذف</button></div>`;
+  });
+}
+
+function addMediaFromInput(){
+  const file = document.getElementById('mediaFile').files[0];
+  if(!file) return alert('اختر ملفاً');
+  const reader = new FileReader();
+  reader.onload = function(e){
+    media.unshift({name:file.name, data:e.target.result});
+    save(KEYS.media, media);
+    renderMediaSelect();
+  }
+  reader.readAsDataURL(file);
+}
+
+function renderMediaSelect(){
+  const sel = document.getElementById('prodMediaSelect');
+  const artSel = document.getElementById('articleMediaSelect');
+  [sel, artSel].forEach(s=>{
+    if(!s) return;
+    s.innerHTML = '<option value="">لا شيء</option>';
+    media.forEach((m,i)=> s.innerHTML += `<option value="${i}">${m.name}</option>`);
+  });
+}
+
+function addArticle(){
+  const title = document.getElementById('articleTitle').value.trim();
+  const body = document.getElementById('articleBody').value.trim();
+  const mediaIdx = document.getElementById('articleMediaSelect').value;
+  const featured = document.getElementById('articleFeatured').checked;
+  if(!title) return alert('أدخل عنوان المقال');
+  articles.unshift({title, body, media: media[mediaIdx]?media[mediaIdx].data:'', featured});
+  save(KEYS.articles, articles);
+  renderArticles();
+  renderArticlesAdmin();
+  document.getElementById('articleTitle').value='';
+  document.getElementById('articleBody').value='';
+}
+
+function renderArticlesAdmin(){
+  const list = document.getElementById('adminArticlesList');
+  list.innerHTML = articles.length ? '' : 'لا توجد مقالات';
+  articles.forEach((a,i)=>{
+    list.innerHTML += `<div class="small">📄 ${a.title} ${a.featured?'⭐':''}
+      <button onclick="articles.splice(${i},1); save(KEYS.articles,articles); renderArticles(); renderArticlesAdmin()">حذف</button></div>`;
+  });
+}
+
+function viewProduct(i){
+  const p = products[i];
+  const c = document.getElementById('viewModalContent');
+  c.innerHTML = `<h2>${p.name}</h2>${p.image?`<img src="${p.image}">`:''}<p>${p.desc}</p><p>السعر: ${p.price} ج.م</p>`;
+  openModal('viewModal');
+}
+
+function openCartModal(i){
+  cartTempIndex = i;
+  document.getElementById('cartModalProductName').innerText = products[i].name;
+  openModal('cartModal');
+}
+let cartTempIndex = null;
+
+function confirmCartOrder(){
+  const phone = document.getElementById('orderPhone').value.trim();
+  const addr = document.getElementById('orderAddress').value.trim();
+  if(!phone||!addr) return alert('أكمل جميع البيانات');
+  const prod = products[cartTempIndex];
+  orders.unshift({product:prod.name, price:prod.price, phone, address, time:new Date().toLocaleString()});
+  cart.push({product:prod.name, price:prod.price});
+  save(KEYS.orders,orders); save(KEYS.cart,cart);
+  document.getElementById('orderPhone').value=''; document.getElementById('orderAddress').value='';
+  closeModal('cartModal'); renderShop(); renderOrders();
+}
+
+function renderOrders(){
+  const list = document.getElementById('ordersList');
+  list.innerHTML = orders.length ? '' : 'لا توجد طلبات';
+  orders.forEach((o,i)=> list.innerHTML += `<div class="small">🛒 ${o.product} - ${o.phone} - ${o.address} - ${o.time} 
+    <button onclick="orders.splice(${i},1); save(KEYS.orders,orders); renderOrders()">حذف</button></div>`);
+}
+
+function openModal(id){document.getElementById(id).style.display='flex';}
+function closeModal(id){document.getElementById(id).style.display='none';}
+function openCodePrompt(){openModal('codePrompt');}
+function checkAdminCode(){
+  const code = document.getElementById('codeInput').value.trim();
+  if(code===settings.code){navigate('admin');closeModal('codePrompt');document.getElementById('codeInput').value='';}
+  else alert('الكود غير صحيح');
+}
+
+function saveSettings(){
+  settings.title = document.getElementById('inputTitle').value.trim();
+  settings.tag = document.getElementById('inputTag').value.trim();
+  settings.logoText = document.getElementById('inputLogo').value.trim();
+  settings.facebook = document.getElementById('inputFB').value.trim();
+  settings.whatsapp = document.getElementById('inputWA').value.trim();
+  settings.instagram = document.getElementById('inputInsta').value.trim();
+  settings.code = document.getElementById('inputCode').value.trim();
+  settings.color = document.getElementById('inputColor').value;
+  save(KEYS.settings,settings);
+  applySettingsToDOM();
+  alert('تم الحفظ');
+}
+
+function resetData(){ if(confirm('سيتم مسح كل البيانات؟')){localStorage.clear();location.reload();} }
+
+function renderProductsDropdown(){ document.getElementById('cartCount').innerText = cart.length; }
+
+applySettingsToDOM();
+renderSocialLinks();
+renderArticles();
+renderMediaSelect();
+renderSectionsAdmin();
+updateSectionSelectors();
+renderProductsAdmin();
+renderShop();
+renderArticlesAdmin();
+renderOrders();
+navigate('home');
+</script>
+
+</body>
+</html>
